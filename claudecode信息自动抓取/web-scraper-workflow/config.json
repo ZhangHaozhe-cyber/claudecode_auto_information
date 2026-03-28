@@ -1,0 +1,30 @@
+{
+  "sources": [
+    {
+      "name": "hacker_news",
+      "type": "api",
+      "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
+      "limit": 10,
+      "description": "Hacker News 热门文章"
+    },
+    {
+      "name": "github_trending",
+      "type": "web",
+      "url": "https://github.com/trending",
+      "selector": ".Box-row",
+      "description": "GitHub 每日 Trending"
+    },
+    {
+      "name": "arxiv_ai",
+      "type": "rss",
+      "url": "https://rss.arxiv.org/rss/cs.AI",
+      "limit": 5,
+      "description": "arXiv AI 最新论文"
+    }
+  ],
+  "report": {
+    "language": "zh-CN",
+    "tone": "professional",
+    "sections": ["摘要", "各源详情", "趋势分析", "值得关注的内容"]
+  }
+}
