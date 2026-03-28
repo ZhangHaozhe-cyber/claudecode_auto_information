@@ -1,0 +1,1 @@
+# claudecode_auto_information
