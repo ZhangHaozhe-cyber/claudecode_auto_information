@@ -1,0 +1,38 @@
+[
+  {
+    "title": "国务院关于《中国（江苏）自由贸易试验区生物医药全产业链开放创新发展方案》的批复",
+    "link": "https://www.gov.cn/zhengce/content/202508/content_7037374.htm",
+    "pub_date": "2025-08-21",
+    "department": "国务院",
+    "policy_type": "纲领性文件",
+    "cwrq": "2025-08-18",
+    "fwzh": "国函〔2025〕80号",
+    "source_col": null,
+    "tags_display": "创新药",
+    "tag_集采": false,
+    "tag_医保": false,
+    "tag_创新药": true,
+    "tag_医改": false,
+    "tag_临床试验": false,
+    "tag_药监": false,
+    "tag_疫苗": false
+  },
+  {
+    "title": "国家医保局 国家卫生健康委关于印发《支持创新药高质量发展的若干措施》的通知",
+    "link": "https://www.nhsa.gov.cn/art/2025/7/1/art_104_17058.html",
+    "pub_date": "2025-07-01",
+    "department": "国家医疗保障局",
+    "policy_type": "政策法规",
+    "cwrq": null,
+    "fwzh": null,
+    "source_col": "col104",
+    "tags_display": "医保、创新药",
+    "tag_集采": false,
+    "tag_医保": true,
+    "tag_创新药": true,
+    "tag_医改": false,
+    "tag_临床试验": false,
+    "tag_药监": false,
+    "tag_疫苗": false
+  }
+]

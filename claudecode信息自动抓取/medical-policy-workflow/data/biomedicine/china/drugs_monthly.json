@@ -1,0 +1,56 @@
+[
+  {
+    "drug_name": "阿达木单抗生物类似药（HLX03）",
+    "institution": "复宏汉霖",
+    "target": "TNF-α",
+    "current_phase": "已上市",
+    "event_date": "2024-11-01",
+    "source_url": "https://www.nmpa.gov.cn",
+    "notes": "国内首批获批生物类似药，适应症：类风湿关节炎、强直性脊柱炎"
+  },
+  {
+    "drug_name": "伊努西单抗（IBI318）",
+    "institution": "信达生物",
+    "target": "PD-1/PD-L1",
+    "current_phase": "临床III期",
+    "event_date": "2026-01-15",
+    "source_url": "https://www.chinadrugtrials.org.cn",
+    "notes": "PD-1/PD-L1双特异性抗体，联合化疗用于晚期非小细胞肺癌"
+  },
+  {
+    "drug_name": "格来雷塞（Glecirasib）",
+    "institution": "加科思药业",
+    "target": "KRAS G12C",
+    "current_phase": "临床II期",
+    "event_date": "2025-11-20",
+    "source_url": "https://www.chinadrugtrials.org.cn",
+    "notes": "国内首个进入II期的KRAS G12C抑制剂，适应症：结直肠癌"
+  },
+  {
+    "drug_name": "马西莫德（Mazdutide）",
+    "institution": "华东医药",
+    "target": "GLP-1R/GIPR",
+    "current_phase": "临床III期",
+    "event_date": "2026-02-01",
+    "source_url": "https://www.chinadrugtrials.org.cn",
+    "notes": "GLP-1/GIP双受体激动剂，用于2型糖尿病及肥胖症，III期入组完毕"
+  },
+  {
+    "drug_name": "奥布替尼（Orelabrutinib）",
+    "institution": "诺诚健华",
+    "target": "BTK",
+    "current_phase": "NDA申请",
+    "event_date": "2026-03-01",
+    "source_url": "https://www.nmpa.gov.cn",
+    "notes": "高选择性二代BTK抑制剂，慢淋/套细胞淋巴瘤NDA已受理"
+  },
+  {
+    "drug_name": "瑞卡西单抗（Recaticimab）",
+    "institution": "君实生物",
+    "target": "PCSK9",
+    "current_phase": "临床I期",
+    "event_date": "2025-08-10",
+    "source_url": "https://www.chinadrugtrials.org.cn",
+    "notes": "PCSK9单抗生物类似药，用于高胆固醇血症，I期安全性研究进行中"
+  }
+]
