@@ -1,0 +1,30 @@
+{
+  "country": "us",
+  "country_name": "美国",
+  "_note": "第二阶段实现。核心监管机构：FDA (Food and Drug Administration), HHS (Dept. of Health & Human Services), CMS (Centers for Medicare & Medicaid Services)。建议数据源：FDA Guidance Documents RSS, Federal Register (federalregister.gov API), HHS News RSS",
+  "sources": [],
+  "report": {
+    "language": "en-US",
+    "tone": "academic",
+    "mode": "daily",
+    "research_context": "US pharmaceutical regulatory policy monitoring for comparative DID analysis",
+    "daily_sections": [
+      "Executive Summary",
+      "FDA Dynamics",
+      "HHS/CMS Dynamics",
+      "Key Policy Events",
+      "Data Quality Notes"
+    ],
+    "weekly_sections": [
+      "Weekly Executive Summary",
+      "Agency Policy Review",
+      "Trend Analysis",
+      "Comparison Notes (vs China)",
+      "Next Week Focus"
+    ],
+    "did_keywords": [
+      "drug approval", "NDA", "BLA", "IND", "clinical trial",
+      "Medicare negotiation", "Inflation Reduction Act", "drug pricing"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "country": "uk",
+  "country_name": "英国",
+  "_note": "第二阶段实现。核心监管机构：MHRA (Medicines and Healthcare products Regulatory Agency), NICE (National Institute for Health and Care Excellence)。建议数据源：MHRA Latest news RSS (https://www.gov.uk/search/news-and-communications.atom?organisations%5B%5D=medicines-and-healthcare-products-regulatory-agency), NICE guidance RSS",
+  "sources": [],
+  "report": {
+    "language": "en-GB",
+    "tone": "academic",
+    "mode": "daily",
+    "research_context": "UK pharmaceutical regulatory policy monitoring for comparative DID analysis",
+    "daily_sections": [
+      "Executive Summary",
+      "MHRA Dynamics",
+      "NICE Appraisals",
+      "Key Events",
+      "Data Quality Notes"
+    ],
+    "weekly_sections": [
+      "Weekly Summary",
+      "Agency Policy Review",
+      "Trend Analysis",
+      "Next Week Focus"
+    ],
+    "did_keywords": [
+      "marketing authorisation", "clinical trial", "NICE appraisal",
+      "drug approval", "health technology assessment", "reimbursement"
+    ]
+  }
+}

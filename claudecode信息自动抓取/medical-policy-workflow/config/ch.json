@@ -1,0 +1,27 @@
+{
+  "country": "ch",
+  "country_name": "瑞士",
+  "_note": "第二阶段实现。核心监管机构：Swissmedic (Swiss Agency for Therapeutic Products)。建议数据源：Swissmedic Authorisations RSS (https://www.swissmedic.ch/swissmedic/en/home/humanarzneimittel/authorisations.html), Swissmedic News RSS",
+  "sources": [],
+  "report": {
+    "language": "en",
+    "tone": "academic",
+    "mode": "daily",
+    "research_context": "Switzerland pharmaceutical regulatory policy monitoring for comparative DID analysis",
+    "daily_sections": [
+      "Executive Summary",
+      "Swissmedic Dynamics",
+      "Key Events",
+      "Data Quality Notes"
+    ],
+    "weekly_sections": [
+      "Weekly Summary",
+      "Agency Policy Review",
+      "Trend Analysis",
+      "Next Week Focus"
+    ],
+    "did_keywords": [
+      "marketing authorisation", "clinical trial", "drug approval", "therapeutic product"
+    ]
+  }
+}

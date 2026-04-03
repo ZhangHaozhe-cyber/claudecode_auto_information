@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.env
+*.log
+output/error_log.json
+scripts/__pycache__/
+pipeline/__pycache__/

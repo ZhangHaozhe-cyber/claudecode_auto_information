@@ -1,0 +1,28 @@
+{
+  "country": "jp",
+  "country_name": "日本",
+  "_note": "第二阶段实现。核心监管机构：PMDA (Pharmaceuticals and Medical Devices Agency), 厚生労働省 (MHLW, Ministry of Health, Labour and Welfare)。建议数据源：PMDA New Notifications RSS, MHLW Press Releases",
+  "sources": [],
+  "report": {
+    "language": "ja",
+    "tone": "academic",
+    "mode": "daily",
+    "research_context": "Japan pharmaceutical regulatory policy monitoring for comparative DID analysis",
+    "daily_sections": [
+      "Executive Summary",
+      "PMDA Dynamics",
+      "MHLW Policy Updates",
+      "Key Events",
+      "Data Quality Notes"
+    ],
+    "weekly_sections": [
+      "Weekly Summary",
+      "Agency Policy Review",
+      "Trend Analysis",
+      "Next Week Focus"
+    ],
+    "did_keywords": [
+      "承認", "薬価", "新薬", "臨床試験", "医薬品", "製造販売承認"
+    ]
+  }
+}

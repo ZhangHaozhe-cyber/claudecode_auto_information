@@ -1,0 +1,28 @@
+{
+  "country": "de",
+  "country_name": "德国",
+  "_note": "第二阶段实现。核心监管机构：BfArM (Bundesinstitut für Arzneimittel und Medizinprodukte), BMG (Bundesministerium für Gesundheit), G-BA (Gemeinsamer Bundesausschuss)。建议数据源：BfArM Bekanntmachungen RSS, BMG Press releases, G-BA Beschlüsse RSS",
+  "sources": [],
+  "report": {
+    "language": "de",
+    "tone": "academic",
+    "mode": "daily",
+    "research_context": "Germany pharmaceutical regulatory policy monitoring for comparative DID analysis",
+    "daily_sections": [
+      "Executive Summary",
+      "BfArM Dynamics",
+      "BMG / G-BA Updates",
+      "Key Events",
+      "Data Quality Notes"
+    ],
+    "weekly_sections": [
+      "Weekly Summary",
+      "Agency Policy Review",
+      "Trend Analysis",
+      "Next Week Focus"
+    ],
+    "did_keywords": [
+      "Zulassung", "klinische Studie", "Erstattung", "AMNOG", "Nutzenbewertung", "Arzneimittel"
+    ]
+  }
+}

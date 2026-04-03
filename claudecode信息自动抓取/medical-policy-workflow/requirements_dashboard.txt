@@ -1,0 +1,9 @@
+# 看板依赖 — 独立安装，不影响现有抓取器依赖
+# pip install -r requirements_dashboard.txt
+
+streamlit>=1.32.0
+plotly>=5.20.0
+pandas>=2.0.0
+pyarrow>=14.0.0
+pydantic>=2.6.0
+streamlit-aggrid>=0.3.4

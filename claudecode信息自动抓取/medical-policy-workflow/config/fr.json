@@ -1,0 +1,29 @@
+{
+  "country": "fr",
+  "country_name": "法国",
+  "_note": "第二阶段实现。核心监管机构：ANSM (Agence nationale de sécurité du médicament et des produits de santé), HAS (Haute Autorité de Santé)。建议数据源：ANSM Décisions/Avis RSS, HAS Avis de la Commission de transparence RSS",
+  "sources": [],
+  "report": {
+    "language": "fr",
+    "tone": "academic",
+    "mode": "daily",
+    "research_context": "France pharmaceutical regulatory policy monitoring for comparative DID analysis",
+    "daily_sections": [
+      "Résumé exécutif",
+      "Actualités ANSM",
+      "Avis HAS",
+      "Événements clés",
+      "Qualité des données"
+    ],
+    "weekly_sections": [
+      "Résumé hebdomadaire",
+      "Revue des agences",
+      "Analyse des tendances",
+      "Points de vigilance"
+    ],
+    "did_keywords": [
+      "autorisation de mise sur le marché", "essai clinique", "remboursement",
+      "évaluation", "médicament", "AMM"
+    ]
+  }
+}

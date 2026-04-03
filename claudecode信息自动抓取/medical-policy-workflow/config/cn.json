@@ -1,0 +1,178 @@
+{
+  "country": "cn",
+  "country_name": "中国",
+  "sources": [
+    {
+      "name": "nhsa_news",
+      "department": "国家医疗保障局",
+      "policy_type": "医保动态",
+      "type": "web_cdata",
+      "url": "https://www.nhsa.gov.cn/col/col14/index.html",
+      "base_url": "https://www.nhsa.gov.cn",
+      "limit": 15,
+      "keywords_filter": [],
+      "description": "国家医保局医保动态，含集采公告、医保谈判（CDATA格式）"
+    },
+    {
+      "name": "nhsa_jicai",
+      "department": "国家医疗保障局",
+      "policy_type": "集采专栏",
+      "type": "web_cdata",
+      "url": "https://www.nhsa.gov.cn/col/col147/index.html",
+      "base_url": "https://www.nhsa.gov.cn",
+      "limit": 20,
+      "keywords_filter": [],
+      "description": "国家医保局药品和耗材集中带量采购专栏（CDATA格式）"
+    },
+    {
+      "name": "nhsa_policy",
+      "department": "国家医疗保障局",
+      "policy_type": "政策法规",
+      "type": "web_cdata",
+      "url": "https://www.nhsa.gov.cn/col/col104/index.html",
+      "base_url": "https://www.nhsa.gov.cn",
+      "limit": 15,
+      "keywords_filter": [],
+      "description": "国家医保局政策法规（col104，CDATA格式）"
+    },
+    {
+      "name": "nhsa_jiedu",
+      "department": "国家医疗保障局",
+      "policy_type": "政策解读",
+      "type": "web_cdata",
+      "url": "https://www.nhsa.gov.cn/col/col105/index.html",
+      "base_url": "https://www.nhsa.gov.cn",
+      "limit": 10,
+      "keywords_filter": [],
+      "description": "国家医保局政策解读（col105，CDATA格式）"
+    },
+    {
+      "name": "gov_policy",
+      "department": "国务院",
+      "policy_type": "纲领性文件",
+      "type": "api_json",
+      "url": "https://www.gov.cn/zhengce/zuixin/ZUIXINZHENGCE.json",
+      "base_url": "https://www.gov.cn",
+      "limit": 20,
+      "keywords_filter": ["医药", "医疗", "药品", "卫生", "健康", "医保", "集采", "生物"],
+      "field_map": {
+        "title": "TITLE",
+        "link": "URL",
+        "pub_date": "DOCRELPUBTIME"
+      },
+      "description": "国务院最新政策 JSON API，筛选医药卫生相关顶层文件"
+    },
+    {
+      "name": "nmpa_yaowen",
+      "department": "国家药品监督管理局",
+      "policy_type": "药品资讯",
+      "type": "web",
+      "url": "https://www.nmpa.gov.cn/yaowen/ypyw/index.html",
+      "base_url": "https://www.nmpa.gov.cn",
+      "selector": ".list-news li",
+      "title_attr": "a",
+      "date_attr": "span",
+      "link_attr": "a[href]",
+      "limit": 15,
+      "keywords_filter": [],
+      "skip": true,
+      "_skip_reason": "全站 JS 反爬（412 Precondition Failed），需浏览器自动化方可访问。",
+      "description": "国家药监局药品资讯（暂不可用：412反爬）"
+    },
+    {
+      "name": "nmpa_notice",
+      "department": "国家药品监督管理局",
+      "policy_type": "公告通告",
+      "type": "web",
+      "url": "https://www.nmpa.gov.cn/xxgk/ggtg/index.html",
+      "base_url": "https://www.nmpa.gov.cn",
+      "selector": ".list-news li",
+      "title_attr": "a",
+      "date_attr": "span",
+      "link_attr": "a[href]",
+      "limit": 15,
+      "keywords_filter": [],
+      "skip": true,
+      "_skip_reason": "全站 JS 反爬（412），需浏览器自动化方可访问。",
+      "description": "国家药监局公告通告（暂不可用：412反爬）"
+    },
+    {
+      "name": "nhc_news",
+      "department": "国家卫生健康委员会",
+      "policy_type": "新闻发布",
+      "type": "web",
+      "url": "https://www.nhc.gov.cn/xcs/new_index.shtml",
+      "base_url": "https://www.nhc.gov.cn",
+      "selector": ".list li",
+      "title_attr": "a",
+      "date_attr": "span",
+      "link_attr": "a[href]",
+      "limit": 10,
+      "keywords_filter": [],
+      "skip": true,
+      "_skip_reason": "全站 JS 反爬（412），需浏览器自动化方可访问。",
+      "description": "国家卫健委新闻（暂不可用：412反爬）"
+    },
+    {
+      "name": "nhc_policy",
+      "department": "国家卫生健康委员会",
+      "policy_type": "政策解读",
+      "type": "web",
+      "url": "https://www.nhc.gov.cn/wjw/zcjd/index.shtml",
+      "base_url": "https://www.nhc.gov.cn",
+      "selector": ".list li",
+      "title_attr": "a",
+      "date_attr": "span",
+      "link_attr": "a[href]",
+      "limit": 10,
+      "keywords_filter": [],
+      "skip": true,
+      "_skip_reason": "全站 JS 反爬（412），需浏览器自动化方可访问。",
+      "description": "国家卫健委政策解读（暂不可用：412反爬）"
+    },
+    {
+      "name": "miit_policy",
+      "department": "工业和信息化部",
+      "policy_type": "政策文件",
+      "type": "web",
+      "url": "https://www.miit.gov.cn/zwgk/zcwj/wjfb/index.html",
+      "base_url": "https://www.miit.gov.cn",
+      "selector": ".result-item",
+      "title_attr": "a",
+      "date_attr": ".date",
+      "link_attr": "a[href]",
+      "limit": 10,
+      "keywords_filter": ["医药", "生物", "制药", "药品", "健康", "医疗"],
+      "skip": true,
+      "_skip_reason": "页面内容由 AJAX 动态加载，静态抓取无内容。",
+      "description": "工信部政策文件（暂不可用：AJAX动态加载）"
+    }
+  ],
+  "report": {
+    "language": "zh-CN",
+    "tone": "academic",
+    "mode": "daily",
+    "research_context": "研究中国医药集采政策对全球临床试验数量的影响（DID实证分析）",
+    "daily_sections": [
+      "执行摘要",
+      "医保局（NHSA）动态",
+      "国务院政策动态",
+      "集采相关重点事件标记",
+      "数据抓取质量说明"
+    ],
+    "weekly_sections": [
+      "本周执行摘要",
+      "各机构政策周报",
+      "集采政策重大进展",
+      "政策趋势分析",
+      "DID分析相关事件汇总",
+      "下周关注要点"
+    ],
+    "did_keywords": [
+      "集采", "带量采购", "联采", "国家组织药品集中采购",
+      "医保谈判", "医保目录", "价格联动",
+      "上市许可", "审评审批", "临床试验",
+      "医药产业", "高质量发展", "集中采购"
+    ]
+  }
+}

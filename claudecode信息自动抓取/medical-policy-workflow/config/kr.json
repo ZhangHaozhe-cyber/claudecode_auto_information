@@ -1,0 +1,28 @@
+{
+  "country": "kr",
+  "country_name": "韩国",
+  "_note": "第二阶段实现。核心监管机构：MFDS (Ministry of Food and Drug Safety, 식품의약품안전처), 보건복지부 (Ministry of Health and Welfare)。建议数据源：MFDS 공고/고시 RSS, MOHW press releases",
+  "sources": [],
+  "report": {
+    "language": "ko",
+    "tone": "academic",
+    "mode": "daily",
+    "research_context": "Korea pharmaceutical regulatory policy monitoring for comparative DID analysis",
+    "daily_sections": [
+      "Executive Summary",
+      "MFDS Dynamics",
+      "MOHW Policy Updates",
+      "Key Events",
+      "Data Quality Notes"
+    ],
+    "weekly_sections": [
+      "Weekly Summary",
+      "Agency Policy Review",
+      "Trend Analysis",
+      "Next Week Focus"
+    ],
+    "did_keywords": [
+      "의약품", "임상시험", "허가", "약가", "보험급여", "신약"
+    ]
+  }
+}
