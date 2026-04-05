@@ -160,11 +160,162 @@ def scrape_rss(source: dict) -> list:
     return items
 
 
+def scrape_playwright(source: dict) -> list:
+    """
+    Playwright headless Chromium 抓取，适用于：
+    - 412 JS 反爬（NMPA、NHC）：真实浏览器头绕过服务器检测
+    - AJAX 动态渲染（MIIT）：等待 JS 执行后提取内容
+    source 配置字段：
+      selector   — 列表项 CSS 选择器
+      title_attr — 标题子选择器（默认 "a"）
+      date_attr  — 日期子选择器（默认 ""）
+      link_attr  — 链接子选择器（默认 "a"）
+      wait_for   — 可选，等待此选择器出现后再解析（AJAX 场景）
+      limit      — 最多返回条数
+    Playwright lazy import：未安装时不影响其他 scraper 类型。
+    """
+    from playwright.sync_api import sync_playwright
+
+    limit = source.get("limit", 15)
+    base_url = source.get("base_url", "")
+    keywords = source.get("keywords_filter", [])
+    department = source.get("department", "")
+    policy_type = source.get("policy_type", "")
+    wait_for = source.get("wait_for", source.get("selector", "body"))
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0.0.0 Safari/537.36"
+            ),
+            locale="zh-CN",
+            extra_http_headers={
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            },
+        )
+        page = context.new_page()
+        page.goto(source["url"], wait_until="domcontentloaded", timeout=30000)
+        try:
+            page.wait_for_selector(wait_for, timeout=15000)
+        except Exception:
+            pass  # 超时则继续，用已加载内容
+        html = page.content()
+        browser.close()
+
+    soup = BeautifulSoup(html, "html.parser")
+    items = []
+    for el in soup.select(source["selector"])[:limit]:
+        title_tag = el.select_one(source.get("title_attr", "a"))
+        title = title_tag.get_text(strip=True) if title_tag else el.get_text(strip=True)[:100]
+        if not title or not _passes_filter(title, keywords):
+            continue
+
+        item = {"title": title, "department": department, "policy_type": policy_type}
+
+        link_sel = source.get("link_attr", "a")
+        link_tag = (
+            el.select_one(link_sel.replace("[href]", ""))
+            if "[href]" in link_sel
+            else el.select_one(link_sel)
+        )
+        if link_tag and link_tag.get("href"):
+            href = link_tag["href"]
+            item["link"] = (
+                href if href.startswith("http")
+                else (base_url.rstrip("/") + "/" + href.lstrip("/") if base_url else href)
+            )
+
+        date_sel = source.get("date_attr", "")
+        if date_sel:
+            date_tag = el.select_one(date_sel)
+            if date_tag:
+                item["pub_date"] = date_tag.get_text(strip=True)
+
+        items.append(item)
+    return items
+
+
+def scrape_miit_api(source: dict) -> list:
+    """
+    工信部政策文件专用抓取器，使用 search-front-server 搜索 API（JSON）。
+    绕过 AJAX 动态渲染限制，直接查询后端接口。
+    source 配置字段：
+      url          — API 基础 URL（search-front-server/api/search/info）
+      base_url     — 用于拼接相对链接（https://www.miit.gov.cn）
+      miit_cateid  — 搜索类目 ID（默认 "57" = 文件发布）
+      limit        — 最多返回条数
+      keywords_filter — 标题关键词过滤（空列表=不过滤）
+    """
+    from datetime import datetime
+
+    limit = source.get("limit", 10)
+    base_url = source.get("base_url", "https://www.miit.gov.cn")
+    keywords = source.get("keywords_filter", [])
+    department = source.get("department", "工业和信息化部")
+    policy_type = source.get("policy_type", "政策文件")
+    cateid = source.get("miit_cateid", "57")
+
+    headers = {
+        **HEADERS,
+        "Referer": "https://www.miit.gov.cn/zwgk/zcwj/wjfb/index.html",
+    }
+    r = httpx.get(
+        source["url"],
+        params={"websiteid": "110000000000000", "scope": "basic", "q": "",
+                "pg": str(limit * 3), "cateid": cateid, "pos": "1"},
+        timeout=20,
+        headers=headers,
+        follow_redirects=True,
+    )
+    r.raise_for_status()
+
+    data = r.json()
+    raw_results = (
+        data.get("data", {})
+            .get("searchResult", {})
+            .get("dataResults", [])
+    )
+
+    items = []
+    for row in raw_results:
+        if len(items) >= limit:
+            break
+        d = row.get("data", {})
+        title = d.get("title", d.get("title_text", ""))
+        if not title or not _passes_filter(title, keywords):
+            continue
+
+        href = d.get("url", "")
+        link = href if href.startswith("http") else (base_url.rstrip("/") + href if href else "")
+
+        # cdate is Unix milliseconds
+        raw_date = d.get("cdate", d.get("jsearch_date", ""))
+        if raw_date and str(raw_date).isdigit():
+            pub_date = datetime.fromtimestamp(int(raw_date) / 1000).strftime("%Y-%m-%d")
+        else:
+            pub_date = str(raw_date)
+
+        items.append({
+            "title": title,
+            "link": link,
+            "pub_date": pub_date,
+            "department": department,
+            "policy_type": policy_type,
+        })
+    return items
+
+
 SCRAPERS = {
-    "web": scrape_web,
-    "web_cdata": scrape_web_cdata,
-    "api_json": scrape_api_json,
-    "rss": scrape_rss,
+    "web":            scrape_web,
+    "web_cdata":      scrape_web_cdata,
+    "api_json":       scrape_api_json,
+    "rss":            scrape_rss,
+    "web_playwright": scrape_playwright,
+    "miit_api":       scrape_miit_api,
 }
 
 if __name__ == "__main__":
