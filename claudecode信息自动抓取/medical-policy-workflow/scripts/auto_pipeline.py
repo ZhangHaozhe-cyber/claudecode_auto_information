@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -29,6 +30,9 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 DATA_DIR = ROOT / "data" / "cn" / "full"
 CLEANED_JSON_PATH = ROOT / "data" / "cleaned_policies.json"
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 # ── 工具函数 ─────────────────────────────────────────────────────────────────
 
@@ -221,17 +225,71 @@ MOCK_ACADEMIC: list[dict] = [
 ]
 
 
-def step4_deepseek_stub() -> None:
-    """
-    STUB — Phase 3 实现计划：
-      - 对 drug_pipeline.json 新记录调用 DeepSeek API 生成中文摘要和关键词
-      - 对政策记录做语义分类（is_medical: true/false）
-      - 使用 AsyncOpenAI(base_url="https://api.deepseek.com", model="deepseek-chat")
-      - 结果缓存到 output/deepseek_cache.json，避免重复计费
-    """
+def step4_deepseek_enrich(sample_size: int = 10) -> None:
+    """对最新日期的政策记录做小样本 DeepSeek 增强标注并回写 parquet。"""
     print(f"\n{'─' * 55}")
-    print("  4. [STUB] DeepSeek 增强分析 — Phase 3 实现，当前跳过")
-    print("     实现后在此调用: python scripts/scraper_nmpa.py + DeepSeek API")
+    print(f"  4. DeepSeek 增强分析（最新日期抽样 {sample_size} 条）")
+
+    if not PARQUET_PATH.exists():
+        print(f"  [WARN] {PARQUET_PATH.name} 不存在，跳过 step4")
+        return
+
+    api_key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
+    if not api_key:
+        print("  [WARN] 未设置 DEEPSEEK_API_KEY，跳过 step4")
+        return
+
+    try:
+        import pandas as pd
+    except ImportError:
+        print("  [WARN] pandas 未安装，跳过 step4")
+        return
+
+    try:
+        from analyzer import enrich_policy_records
+    except Exception as e:
+        print(f"  [WARN] 无法导入 analyzer.enrich_policy_records: {e}")
+        return
+
+    df = pd.read_parquet(PARQUET_PATH)
+    if df.empty:
+        print("  [WARN] cleaned_policies.parquet 为空，跳过 step4")
+        return
+
+    df["pub_date"] = pd.to_datetime(df["pub_date"], errors="coerce")
+    latest_date = df["pub_date"].max()
+    latest_df = df[df["pub_date"] == latest_date].copy()
+    if latest_df.empty:
+        print("  [WARN] 最新日期切片为空，跳过 step4")
+        return
+
+    sample_df = latest_df.sort_values("pub_date", ascending=False).head(sample_size).copy()
+    records = sample_df.to_dict("records")
+    try:
+        enriched = enrich_policy_records(records, sample_size=sample_size)
+    except Exception as e:
+        print(f"  [WARN] Step4 调用 DeepSeek 失败: {e}")
+        return
+    if not enriched:
+        print("  [WARN] DeepSeek 未返回可解析增强结果，保留原 parquet")
+        return
+
+    for col, default in (("llm_relevance", ""), ("llm_tags", ""), ("llm_reason", "")):
+        if col not in df.columns:
+            df[col] = default
+
+    for row in enriched:
+        idx = row["idx"]
+        src = records[idx]
+        mask = (df["link"] == src.get("link", "")) & (df["title"] == src.get("title", ""))
+        if not mask.any():
+            continue
+        df.loc[mask, "llm_relevance"] = row.get("llm_relevance", "")
+        df.loc[mask, "llm_tags"] = "、".join(row.get("llm_tags", []))
+        df.loc[mask, "llm_reason"] = row.get("llm_reason", "")
+
+    df.to_parquet(PARQUET_PATH, index=False, engine="pyarrow")
+    print(f"  已回写增强结果到 {PARQUET_PATH.name}（命中 {len(enriched)} 条）")
 
 
 # ── Step 5：生成 Next.js 前端 JSON 文件 ──────────────────────────────────────
@@ -374,6 +432,7 @@ def main() -> None:
     parser.add_argument("--skip-drugs", action="store_true", help="跳过药管线数据抓取（Step 3）")
     parser.add_argument("--skip-frontend", action="store_true", help="跳过前端 JSON 生成（Step 5）")
     parser.add_argument("--llm-filter", action="store_true", help="启用 LLM 语义过滤（需 ANTHROPIC_API_KEY）")
+    parser.add_argument("--step4-sample", type=int, default=10, help="Step4 DeepSeek 增强抽样条数（默认10）")
     parser.add_argument("--dry-run", action="store_true", help="仅打印执行计划，不实际运行")
     args = parser.parse_args()
 
@@ -389,7 +448,7 @@ def main() -> None:
             print("  3. scraper_drugs.py → data/drug_pipeline.json")
         else:
             print("  3. [跳过] scraper_drugs.py")
-        print("  4. [STUB] DeepSeek 增强分析")
+        print(f"  4. DeepSeek 增强分析（抽样 {args.step4_sample} 条）")
         if not args.skip_frontend:
             print("  5. Generate frontend JSON (data/biomedicine/... data/biomanufacturing/...)")
         return
@@ -402,7 +461,7 @@ def main() -> None:
     else:
         print("\n  [跳过] Step 3: scraper_drugs.py（--skip-drugs）")
 
-    step4_deepseek_stub()
+    step4_deepseek_enrich(sample_size=args.step4_sample)
 
     if not args.skip_frontend:
         step5_generate_frontend_json()

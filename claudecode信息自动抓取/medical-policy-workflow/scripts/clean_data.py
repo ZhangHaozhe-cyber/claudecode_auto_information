@@ -92,6 +92,7 @@ KEYWORD_TAXONOMY: dict[str, list[str]] = {
 
 _ISO_FORMATS = ["%Y-%m-%d", "%Y/%m/%d", "%Y-%m-%dT%H:%M:%S", "%Y年%m月%d日"]
 _NHSA_URL_PATTERN = re.compile(r"/art/(\d{4})/(\d{1,2})/(\d{1,2})/")
+_DATE_REGEX = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
 
 def parse_pub_date(raw: str, link: str) -> Optional[datetime]:
@@ -101,9 +102,21 @@ def parse_pub_date(raw: str, link: str) -> Optional[datetime]:
     2. 失败则从 URL 提取（NHSA 的 /art/YYYY/M/D/ 格式）
     3. 均失败返回 None → 进入 error_log
     """
+    # 先对常见噪声做清洗：去括号、去空格，过滤“上一页”等非日期文案。
+    raw_str = raw if isinstance(raw, str) else ""
+    clean_str = raw_str.replace("(", "").replace(")", "").strip()
+
+    # 优先提取 YYYY-MM-DD，适配 NMPA 的 "(2026-04-10)" 形式。
+    m_date = _DATE_REGEX.search(clean_str)
+    if m_date:
+        try:
+            return datetime.strptime(m_date.group(1), "%Y-%m-%d")
+        except ValueError:
+            pass
+
     for fmt in _ISO_FORMATS:
         try:
-            return datetime.strptime(raw.strip(), fmt)
+            return datetime.strptime(clean_str, fmt)
         except ValueError:
             continue
 

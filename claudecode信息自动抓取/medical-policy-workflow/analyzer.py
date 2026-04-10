@@ -1,6 +1,13 @@
-import anthropic, argparse, json, sys
+import argparse
+import json
+import os
+import re
+import sys
+import time
 from datetime import date, timedelta
 from pathlib import Path
+
+import httpx
 
 os_chdir_done = False
 
@@ -110,6 +117,116 @@ DID研究关键词（请在报告中特别标记包含这些主题的政策）�
     return prompt
 
 
+def _call_deepseek(prompt: str) -> str:
+    api_key = os.getenv("DEEPSEEK_API_KEY", "")
+    if not api_key:
+        raise RuntimeError("DEEPSEEK_API_KEY is not set")
+
+    base_url = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+    model = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+    url = base_url.rstrip("/") + "/chat/completions"
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.2,
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "User-Agent": "medical-policy-workflow/1.0 (+python-httpx)",
+        "Connection": "close",
+        "Authorization": f"Bearer {api_key}",
+    }
+    data = None
+    # 首先禁用环境代理变量（部分本地代理会导致 TLS EOF），失败后再回退 trust_env=True。
+    for trust_env in (False, True):
+        for attempt in range(2):
+            try:
+                with httpx.Client(timeout=120, http2=False, trust_env=trust_env) as client:
+                    resp = client.post(url, headers=headers, json=payload)
+                    resp.raise_for_status()
+                    data = resp.json()
+                break
+            except httpx.HTTPError as e:
+                if attempt == 0:
+                    time.sleep(2)
+                    continue
+                if not trust_env:
+                    print(f"[WARN] DeepSeek request failed with trust_env=False: {e}")
+                    break
+                raise RuntimeError(f"DeepSeek request failed: {e}") from e
+        if data is not None:
+            break
+
+    if not isinstance(data, dict):
+        raise RuntimeError(f"Unexpected DeepSeek response type: {type(data)}")
+    return data["choices"][0]["message"]["content"]
+
+
+def _extract_json_array(raw_text: str) -> list:
+    """Extract and parse a JSON array from model output with optional markdown fences."""
+    raw = (raw_text or "").strip()
+    if raw.startswith("```"):
+        lines = [ln for ln in raw.splitlines() if not ln.strip().startswith("```")]
+        raw = "\n".join(lines).strip()
+    try:
+        parsed = json.loads(raw)
+        return parsed if isinstance(parsed, list) else []
+    except Exception:
+        m = re.search(r"\[[\s\S]*\]", raw)
+        if not m:
+            return []
+        try:
+            parsed = json.loads(m.group(0))
+            return parsed if isinstance(parsed, list) else []
+        except Exception:
+            return []
+
+
+def enrich_policy_records(records: list[dict], sample_size: int = 10) -> list[dict]:
+    """Use DeepSeek to enrich a sampled subset of policy records with relevance/tags/reason fields."""
+    if not records:
+        return []
+
+    sample = records[: max(0, sample_size)]
+    indexed = []
+    for i, rec in enumerate(sample):
+        indexed.append(
+            {
+                "idx": i,
+                "title": rec.get("title", ""),
+                "department": rec.get("department", ""),
+                "pub_date": str(rec.get("pub_date", "")),
+                "link": rec.get("link", ""),
+            }
+        )
+
+    prompt = (
+        "请对以下政策记录做医药政策相关增强标注。\n"
+        "返回严格 JSON 数组，每项包含字段: idx, llm_relevance(高/中/低/无), llm_tags(字符串数组), llm_reason(一句话)。\n"
+        "不要输出任何解释文本。\n\n"
+        f"records:\n{json.dumps(indexed, ensure_ascii=False, indent=2)}"
+    )
+    raw = _call_deepseek(prompt)
+    rows = _extract_json_array(raw)
+    out = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        idx = row.get("idx")
+        if not isinstance(idx, int) or idx < 0 or idx >= len(sample):
+            continue
+        out.append(
+            {
+                "idx": idx,
+                "llm_relevance": str(row.get("llm_relevance", "")).strip() or "中",
+                "llm_tags": row.get("llm_tags") if isinstance(row.get("llm_tags"), list) else [],
+                "llm_reason": str(row.get("llm_reason", "")).strip(),
+            }
+        )
+    return out
+
+
 def analyze(data_dir: Path, config: dict, mode: str, today: date) -> str:
     grouped = _load_data_files(data_dir, mode, today)
 
@@ -118,18 +235,12 @@ def analyze(data_dir: Path, config: dict, mode: str, today: date) -> str:
         sys.exit(1)
 
     prompt = _build_prompt(grouped, config, mode, today)
+    print("[INFO] Analyzer LLM provider: deepseek")
+    return _call_deepseek(prompt)
 
-    client = anthropic.Anthropic()
-    message = client.messages.create(
-        model="claude-opus-4-6",
-        max_tokens=4096,
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return message.content[0].text
 
 
 if __name__ == "__main__":
-    import os
     os.chdir(Path(__file__).parent)
 
     parser = argparse.ArgumentParser(description="Medical Policy Analyzer")
